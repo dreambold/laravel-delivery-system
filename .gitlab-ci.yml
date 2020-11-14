@@ -1,0 +1,35 @@
+stages:
+  - DEVDEPLOY-DEPLOY
+  - PRODUCTION-DEPLOY 
+  - FEATUREDEPLOY-DEPLOY
+
+  
+feature-deployment:
+    stage: FEATUREDEPLOY-DEPLOY
+    tags:
+        -  devwebserver
+    only:
+      refs:
+        - new-driver-dashboard
+    script:
+        - sudo docker exec -i devlaravel bash -c 'cd /var/www/html/; rm .env; git pull; cp .env.features .env'
+
+dev-deployment:
+  stage: DEVDEPLOY-DEPLOY
+  tags:
+       -  predevwebserver
+  only:
+    refs:
+       - development
+  script:
+       - sudo docker exec -i rideondev bash -c 'cd /var/www/html/; rm .env; git pull; cp .env.development .env'
+
+prod-deployment:
+  stage: PRODUCTION-DEPLOY
+  tags:
+       - predevwebserver
+  only:
+    refs:
+       - master
+  script:
+       - sudo docker exec -i gofer bash -c 'cd /var/www/html/; rm .env; git pull; cp .env.production .env'
